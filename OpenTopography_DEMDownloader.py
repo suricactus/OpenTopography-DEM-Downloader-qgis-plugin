@@ -22,23 +22,23 @@
  ***************************************************************************/
 """
 
-__author__ = 'Kyaw Naing Win'
-__date__ = '2022-01-27'
-__copyright__ = '(C) 2022 by Kyaw Naing Win'
+__author__ = "Kyaw Naing Win"
+__date__ = "2022-01-27"
+__copyright__ = "(C) 2022 by Kyaw Naing Win"
 
 # This will get replaced with a git SHA1 when you do a git archive
 
-__revision__ = '$Format:%H$'
+__revision__ = "$Format:%H$"
 
+import inspect
 import os
 import sys
-import inspect
+
 import processing
-
-from qgis.PyQt.QtWidgets import QAction
+from qgis.core import QgsApplication
 from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
 
-from qgis.core import QgsProcessingAlgorithm, QgsApplication
 from .OpenTopography_DEMDownloader_provider import OpenTopographyDEMDownloaderProvider
 
 cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
@@ -48,7 +48,6 @@ if cmd_folder not in sys.path:
 
 
 class OpenTopographyDEMDownloaderPlugin(object):
-
     def __init__(self, iface):
         self.provider = None
         self.iface = iface
@@ -60,11 +59,11 @@ class OpenTopographyDEMDownloaderPlugin(object):
 
     def initGui(self):
         self.initProcessing()
-        
-        icon = os.path.join(os.path.join(cmd_folder, 'icon.png'))
+
+        icon = os.path.join(os.path.join(cmd_folder, "icon.png"))
         self.action = QAction(
-              QIcon(icon),
-              u"OpenTopography DEM Downloader", self.iface.mainWindow())
+            QIcon(icon), u"OpenTopography DEM Downloader", self.iface.mainWindow()
+        )
         self.action.triggered.connect(self.run)
         self.iface.addPluginToRasterMenu(u"&OpenTopography DEM", self.action)
         self.iface.addToolBarIcon(self.action)
@@ -73,6 +72,6 @@ class OpenTopographyDEMDownloaderPlugin(object):
         QgsApplication.processingRegistry().removeProvider(self.provider)
         self.iface.removePluginRasterMenu(u"&OpenTopography DEM", self.action)
         self.iface.removeToolBarIcon(self.action)
-        
-    def run(self):        
+
+    def run(self):
         processing.execAlgorithmDialog("OTDEMDownloader:OpenTopography DEM Downloader")

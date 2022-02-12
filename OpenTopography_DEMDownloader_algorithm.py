@@ -22,66 +22,87 @@
  ***************************************************************************/
 """
 
-__author__ = 'Kyaw Naing Win'
-__date__ = '2022-01-27'
-__copyright__ = '(C) 2022 by Kyaw Naing Win'
+__author__ = "Kyaw Naing Win"
+__date__ = "2022-01-27"
+__copyright__ = "(C) 2022 by Kyaw Naing Win"
 
 # This will get replaced with a git SHA1 when you do a git archive
 
-__revision__ = '$Format:%H$'
+__revision__ = "$Format:%H$"
 
-from qgis.PyQt.QtCore import QCoreApplication
-from qgis.core import (QgsProcessing,                       
-                       QgsProcessingAlgorithm,
-                       QgsProcessingMultiStepFeedback,
-                       QgsProcessingParameterString,
-                       QgsProcessingParameterExtent,
-                       QgsProcessingParameterEnum,
-                       QgsProcessingException,
-                       QgsExpression,
-                       QgsExpressionContext, 
-                       QgsExpressionContextUtils,
-                       QgsProcessingParameterRasterDestination,
-                       QgsCoordinateTransform,
-                       QgsCoordinateReferenceSystem,
-                       QgsProject,
-                       QgsSettings)
-import processing
-import os
 import inspect
+import os
 
+import processing
+from qgis.core import (
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsProcessingAlgorithm,
+    QgsProcessingException,
+    QgsProcessingParameterEnum,
+    QgsProcessingParameterExtent,
+    QgsProcessingParameterRasterDestination,
+    QgsProcessingParameterString,
+    QgsProject,
+    QgsSettings,
+)
+from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 
-class OpenTopographyDEMDownloaderAlgorithm(QgsProcessingAlgorithm):
- 
-    OUTPUT = 'OUTPUT'
-    INPUT = 'INPUT'
 
+class OpenTopographyDEMDownloaderAlgorithm(QgsProcessingAlgorithm):
+
+    OUTPUT = "OUTPUT"
+    INPUT = "INPUT"
 
     def initAlgorithm(self, config):
         my_settings = QgsSettings()
         my_api_key = my_settings.value("OpenTopographyDEMDownloader/ot_api_key", "")
-        if my_api_key=="":
-            api_key_text = 'Enter your API key '
+        if my_api_key == "":
+            api_key_text = "Enter your API key "
         else:
-            api_key_text = 'Enter your API key or use existing one below'
+            api_key_text = "Enter your API key or use existing one below"
 
-        self.addParameter(QgsProcessingParameterEnum('DEMs', 'Select DEM to download', 
-                            options=['SRTM 90m','SRTM 30m','ALOS World 3D 30m','SRTM GL1 Ellipsoidal 30m','Global Bathymetry SRTM15+ V2.1','Copernicus Global DSM 90m','Copernicus Global DSM 30m','NASADEM Global DEM'], 
-                            allowMultiple=False, defaultValue=[0]
-                            )
-                          )
-        self.addParameter(QgsProcessingParameterExtent('Extent', 'Define extent to download', defaultValue=None))
-        self.addParameter(QgsProcessingParameterString('API_key', api_key_text, multiLine=False, defaultValue=my_api_key))
-        self.addParameter(QgsProcessingParameterRasterDestination(self.OUTPUT, self.tr('Output Raster')))
+        self.addParameter(
+            QgsProcessingParameterEnum(
+                "DEMs",
+                "Select DEM to download",
+                options=[
+                    "SRTM 90m",
+                    "SRTM 30m",
+                    "ALOS World 3D 30m",
+                    "SRTM GL1 Ellipsoidal 30m",
+                    "Global Bathymetry SRTM15+ V2.1",
+                    "Copernicus Global DSM 90m",
+                    "Copernicus Global DSM 30m",
+                    "NASADEM Global DEM",
+                ],
+                allowMultiple=False,
+                defaultValue=[0],
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterExtent(
+                "Extent", "Define extent to download", defaultValue=None
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterString(
+                "API_key", api_key_text, multiLine=False, defaultValue=my_api_key
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterRasterDestination(
+                self.OUTPUT, self.tr("Output Raster")
+            )
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
-        
+
         my_settings = QgsSettings()
-                
-        results = {}
+
         outputs = {}
-        
+
         # process extent bbox information
         crs = self.parameterAsExtentCrs(parameters, "Extent", context)
         extent = self.parameterAsExtentGeometry(
@@ -95,50 +116,66 @@ class OpenTopographyDEMDownloaderAlgorithm(QgsProcessingAlgorithm):
                 QgsProject.instance(),
             ).transformBoundingBox(extent)
 
-        dem_codes = ['SRTMGL3','SRTMGL1','AW3D30','SRTMGL1_E','SRTM15Plus','COP90','COP30','NASADEM']
+        dem_codes = [
+            "SRTMGL3",
+            "SRTMGL1",
+            "AW3D30",
+            "SRTMGL1_E",
+            "SRTM15Plus",
+            "COP90",
+            "COP30",
+            "NASADEM",
+        ]
 
-        dem_code = dem_codes[parameters['DEMs']]
+        dem_code = dem_codes[parameters["DEMs"]]
 
         south = extent.yMinimum()
         north = extent.yMaximum()
         west = extent.xMinimum()
         east = extent.xMaximum()
-        dem_url = f'https://portal.opentopography.org/API/globaldem?demtype={dem_code}&south={south}&north={north}&west={west}&east={east}&outputFormat=GTiff'
-        dem_url=dem_url + "&API_Key=" + parameters['API_key']
-        
-        #print ("Download extent in WGS84: ",south,west,north,east)
-        #print (dem_url)
-        
+        dem_url = f"https://portal.opentopography.org/API/globaldem?demtype={dem_code}&south={south}&north={north}&west={west}&east={east}&outputFormat=GTiff"
+        dem_url = dem_url + "&API_Key=" + parameters["API_key"]
+
+        # print ("Download extent in WGS84: ",south,west,north,east)
+        # print (dem_url)
+
         dem_file = self.parameterAsFileOutput(parameters, self.OUTPUT, context)
         try:
             # Download file
-            alg_params = {
-                'URL': dem_url,
-                'OUTPUT': dem_file
-            }
-            outputs['DownloadFile'] = processing.run('native:filedownloader', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-            my_settings.setValue("OpenTopographyDEMDownloader/ot_api_key", parameters['API_key'])
-        except:
-            raise QgsProcessingException ("API Key Error: Please check your API key OR Cannot Access DEM")
+            alg_params = {"URL": dem_url, "OUTPUT": dem_file}
+            outputs["DownloadFile"] = processing.run(
+                "native:filedownloader",
+                alg_params,
+                context=context,
+                feedback=feedback,
+                is_child_algorithm=True,
+            )
+            my_settings.setValue(
+                "OpenTopographyDEMDownloader/ot_api_key", parameters["API_key"]
+            )
+        except Exception:
+            raise QgsProcessingException(
+                "API Key Error: Please check your API key OR Cannot Access DEM"
+            )
 
-                
         # Load layer into project
         dem_file_name = os.path.basename(dem_file)
-        if dem_file_name == 'OUTPUT.tif':
-            alg_params = {           
-                'INPUT': outputs['DownloadFile']['OUTPUT'],
-                'NAME': dem_code+"[Memory]"
+        if dem_file_name == "OUTPUT.tif":
+            alg_params = {
+                "INPUT": outputs["DownloadFile"]["OUTPUT"],
+                "NAME": dem_code + "[Memory]",
             }
         else:
-            alg_params = {           
-                'INPUT': dem_file,
-                'NAME': dem_file_name
-            }
-        outputs['LoadLayerIntoProject'] = processing.run('native:loadlayer', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        
+            alg_params = {"INPUT": dem_file, "NAME": dem_file_name}
+        outputs["LoadLayerIntoProject"] = processing.run(
+            "native:loadlayer",
+            alg_params,
+            context=context,
+            feedback=feedback,
+            is_child_algorithm=True,
+        )
 
-
-        return {self.OUTPUT: outputs['DownloadFile']['OUTPUT']}
+        return {self.OUTPUT: outputs["DownloadFile"]["OUTPUT"]}
 
     def name(self):
         """
@@ -148,7 +185,7 @@ class OpenTopographyDEMDownloaderAlgorithm(QgsProcessingAlgorithm):
         lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         """
-        return 'OpenTopography DEM Downloader'
+        return "OpenTopography DEM Downloader"
 
     def displayName(self):
         """
@@ -172,26 +209,26 @@ class OpenTopographyDEMDownloaderAlgorithm(QgsProcessingAlgorithm):
         contain lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         """
-        return 'DEM Downloader'
+        return "DEM Downloader"
 
     def tr(self, string):
-        return QCoreApplication.translate('Processing', string)
-        
+        return QCoreApplication.translate("Processing", string)
+
     def icon(self):
         cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
-        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'icon.png')))
+        icon = QIcon(os.path.join(os.path.join(cmd_folder, "icon.png")))
         return icon
-        
+
     def shortHelpString(self):
-        help_text = """               
+        help_text = """
         This tool will download DEM for the extent defined by user, from OpenTopography (https://opentopography.org/)
-        
-        As of Jan 2022, API key is required for all DEMs. 
+
+        As of Jan 2022, API key is required for all DEMs.
         Read https://opentopography.org/blog/introducing-api-keys-access-opentopography-global-datasets how to get API key.
-        
+
         Developed by: Kyaw Naing Win
         Date: 2022-01-27
-        email: kyawnaingwinknw@gmail.com 
+        email: kyawnaingwinknw@gmail.com
 
         """
         return self.tr(help_text)

@@ -22,9 +22,9 @@
  This script initializes the plugin, making it known to QGIS.
 """
 
-__author__ = 'Kyaw Naing Win'
-__date__ = '2022-01-27'
-__copyright__ = '(C) 2022 by Kyaw Naing Win'
+__author__ = "Kyaw Naing Win"
+__date__ = "2022-01-27"
+__copyright__ = "(C) 2022 by Kyaw Naing Win"
 
 
 # noinspection PyPep8Naming
@@ -34,6 +34,7 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface
     """
-    
+
     from .OpenTopography_DEMDownloader import OpenTopographyDEMDownloaderPlugin
+
     return OpenTopographyDEMDownloaderPlugin(iface)

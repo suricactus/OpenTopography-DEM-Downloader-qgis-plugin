@@ -22,23 +22,23 @@
  ***************************************************************************/
 """
 
-__author__ = 'Kyaw Naing Win'
-__date__ = '2022-01-27'
-__copyright__ = '(C) 2022 by Kyaw Naing Win'
+__author__ = "Kyaw Naing Win"
+__date__ = "2022-01-27"
+__copyright__ = "(C) 2022 by Kyaw Naing Win"
 
 # This will get replaced with a git SHA1 when you do a git archive
 
-__revision__ = '$Format:%H$'
-import os
+__revision__ = "$Format:%H$"
 import inspect
-from qgis.PyQt.QtGui import QIcon
+import os
 
 from qgis.core import QgsProcessingProvider
+from qgis.PyQt.QtGui import QIcon
+
 from .OpenTopography_DEMDownloader_algorithm import OpenTopographyDEMDownloaderAlgorithm
 
 
 class OpenTopographyDEMDownloaderProvider(QgsProcessingProvider):
-
     def __init__(self):
         """
         Default constructor.
@@ -50,7 +50,6 @@ class OpenTopographyDEMDownloaderProvider(QgsProcessingProvider):
         Unloads the provider. Any tear-down steps required by the provider
         should be implemented here.
         """
-        pass
 
     def loadAlgorithms(self):
         """
@@ -66,8 +65,8 @@ class OpenTopographyDEMDownloaderProvider(QgsProcessingProvider):
         string should be a unique, short, character only string, eg "qgis" or
         "gdal". This string should not be localised.
         """
-        #'OpenTopographyDEMDownloader'
-        return 'OTDEMDownloader'
+        # 'OpenTopographyDEMDownloader'
+        return "OTDEMDownloader"
 
     def name(self):
         """
@@ -76,7 +75,7 @@ class OpenTopographyDEMDownloaderProvider(QgsProcessingProvider):
 
         This string should be short (e.g. "Lastools") and localised.
         """
-        return self.tr('OpenTopography')
+        return self.tr("OpenTopography")
 
     def icon(self):
         """
@@ -84,7 +83,7 @@ class OpenTopographyDEMDownloaderProvider(QgsProcessingProvider):
         the Processing toolbox.
         """
         cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
-        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'icon.png')))
+        QIcon(os.path.join(os.path.join(cmd_folder, "icon.png")))
         return QgsProcessingProvider.icon(self)
 
     def longName(self):

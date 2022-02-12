@@ -11,7 +11,7 @@ author=Kyaw Naing Win
 email=kyawnaingwinknw@gmail.com
 
 about=This plugin will download DEMs from OpenTopography.org for user selected extent only
- 
+
   DEMs:
   1. SRTM 90m
   2. SRTM 30m
@@ -21,8 +21,8 @@ about=This plugin will download DEMs from OpenTopography.org for user selected e
   6. Copernicus Global DSM 30m
   7. Copernicus Global DSM 90m
   8. NASADEM Global DEM
-  
- ** Get an API Key from OpenTopography.org to download the DEMs 
+
+ ** Get an API Key from OpenTopography.org to download the DEMs
 
 tracker=https://github.com/knwin/OpenTopography-DEM-Downloader-qgis-plugin/issues
 repository=https://github.com/knwin/OpenTopography-DEM-Downloader-qgis-plugin
@@ -62,4 +62,3 @@ Category of the plugin: Raster
 
 # If the plugin can run on QGIS Server.
 server=False
-

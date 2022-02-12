@@ -9,7 +9,7 @@ Extent can be defined with
   1 . a Layer in the content
   2 . current canvas extent
   3 . user specified extent drawn on the canvas
-  
+
 DEMs availables to donwload:
   1. SRTM 90m
   2. SRTM 30m

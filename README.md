@@ -22,3 +22,10 @@ DEMs availables to donwload:
 
 ** You will need an API Key to download these DEMs as per requirement of the OpenTopography.org.
 Read detail insturction to get an API Key here.. https://opentopography.org/blog/introducing-api-keys-access-opentopography-global-datasets
+
+## Development
+
+1. Fork this repo.
+2. Clone on the local machine.
+3. Setup [pre-commit](https://pre-commit.com/). Run `pre-commit install` in the root directory of this repository.
+4. Enjoy!
